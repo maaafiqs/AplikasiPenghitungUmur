@@ -230,6 +230,28 @@ if (Thread.currentThread().isInterrupted()) {
 javax.swing.SwingUtilities.invokeLater(() ->
 txtAreaPeristiwa.setText("Pengambilan data dibatalkan.\n"));
 }
+
+stopFetching = true;
+if (peristiwaThread != null && peristiwaThread.isAlive()) {
+peristiwaThread.interrupt(); // Beri sinyal ke thread untuk berhenti
+}
+// Reset flag untuk thread baru
+stopFetching = false;
+// Mendapatkan peristiwa penting secara asinkron
+peristiwaThread = new Thread(() -> {
+try {
+txtAreaPeristiwa.setText("Tunggu, sedang mengambil data...\n");
+helper.getPeristiwaBarisPerBaris(ulangTahunBerikutnya,
+txtAreaPeristiwa, () -> stopFetching);
+if (!stopFetching) {
+javax.swing.SwingUtilities.invokeLater(() ->
+txtAreaPeristiwa.append("Selesai mengambil data peristiwa"));
+}
+} catch (Exception e) {
+if (Thread.currentThread().isInterrupted()) {
+javax.swing.SwingUtilities.invokeLater(() ->
+txtAreaPeristiwa.setText("Pengambilan data dibatalkan.\n"));
+}
     }//GEN-LAST:event_btnHitungActionPerformed
 
     private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
